@@ -4,7 +4,7 @@ import axios from "axios";
 axios.defaults.headers.common['Authorization'] = "LxvKVGJqiSe6NcEVZOaLXC-f2JIIWZaq_o0WrF8mwJc";
 
 // Перевірка помилок під час виконання запиту до серверу
-axios.defaults.baseURL = "https://api.unsplash.com/search/photos"
+axios.defaults.baseURL = "https://api.unsplash.com/"
 
 
 axios.interceptors.response.use(
@@ -19,7 +19,7 @@ axios.interceptors.response.use(
 
 async function fetchImages(query, page, perPage) {
   const response = await axios.get(
-    `?query=${query}&page=${page}&per_page=${perPage}& orientation='landscape',`,
+    `search/photos?query=${query}&page=${page}&per_page=${perPage}&orientation='landscape',`,
   );
   return response.data; 
 }

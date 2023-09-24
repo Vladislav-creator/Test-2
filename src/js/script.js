@@ -33,19 +33,16 @@ function renderGallery(arr) {
 
   const markup = arr
     .map(
-      (item) => `<a class="gallery__link" href="${item.src.large}">
-          <div class="gallery-item" id="${item.id}">
-            <img class="gallery-item__img" src="${item.src.medium}" alt="${item.alt}" loading="lazy" />
-            <div class="info">
-              <p class="info-item">${item.photographer}</p>
-            </div>
-          </div>
-        </a>`).join('');
+      (item) => `
+      <li class='gallery-item'>
+       <a class="gallery__link"  href="${item.urls.regular}">
+           <img class="gallery-item__img" src='${item.urls.small}' alt='${item.alt_description}'/>
+ </a>
+         </li>`).join('');
 
    gallery.insertAdjacentHTML('beforeend', markup);
-
- 
 }
+
 
 function onSearchForm(e) {
   e.preventDefault();
