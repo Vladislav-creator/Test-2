@@ -3,7 +3,7 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { fetchImages } from './fetchImages';
 import axios from "axios";
-
+import { renderGallery } from './renderGallery';
 axios.interceptors.response.use(
   response => {
     return response;
@@ -17,36 +17,20 @@ axios.interceptors.response.use(
 
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
-
+export {gallery}
 let query = '';
 let page = 1;
-let simpleLightBox;
-const perPage = 80;
+// let simpleLightBox;
+const perPage = 30;
 
 searchForm.addEventListener('submit', onSearchForm);
 
-function renderGallery(arr) {
-  // Перевірка чи існує галерея перед вставкою даних
-  if (!gallery) {
-    return;
-  }
 
-  const markup = arr
-    .map(
-      (item) => `
-      <li class='gallery-item'>
-       <a class="gallery__link"  href="${item.urls.regular}">
-           <img class="gallery-item__img" src='${item.urls.small}' alt='${item.alt_description}'/>
- </a>
-         </li>`).join('');
-
-   gallery.insertAdjacentHTML('beforeend', markup);
-}
 
 
 function onSearchForm(e) {
   e.preventDefault();
-  window.removeEventListener('scroll', showLoadMorePage);
+//   window.removeEventListener('scroll', showLoadMorePage);
   page = 1;
   query = e.currentTarget.elements.searchQuery.value.trim();
   gallery.innerHTML = '';
@@ -59,17 +43,17 @@ function onSearchForm(e) {
   }
 
   fetchImages(query, page, perPage)
-    .then(data => {
-      if (data.total_results === 0) {
+    .then(resp=> {
+      if (resp.results === 0) {
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.',
         );
       } else {
-        renderGallery(data.photos);
+        renderGallery(resp.results);
         simpleLightBox = new SimpleLightbox('.gallery a').refresh();
-        Notiflix.Notify.success(`Hooray! We found ${data.total_results} images.`);
-        if (perPage < data.total_results) {
-          window.addEventListener('scroll', showLoadMorePage);
+        Notiflix.Notify.success(`Hooray! We found ${resp.total} images.`);
+        if (perPage < resp.total) {
+        //   window.addEventListener('scroll', showLoadMorePage);
           // Додати подію на прокручування сторінки, яка викликає функцію showLoadMorePage
         }
       }
@@ -86,13 +70,11 @@ function onloadMore() {
   // simpleLightBox.refresh();
 
   fetchImages(query, page, perPage)
-    .then(data => {
-      renderGallery(data.photos);
+    .then(resp => {
+      renderGallery(resp.results);
       simpleLightBox = new SimpleLightbox('.gallery a').refresh();
 
-      const totalPages = Math.ceil(data.total_results / perPage);
-
-      if (page >= totalPages) {
+      if (page >= resp.total_pages) {
         Notiflix.Notify.failure(
           "We're sorry, but you've reached the end of search results.",
         );
